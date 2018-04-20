@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>JS_Assignment14</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="JS_Assignment8.css" type="text/css"/>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script>
+			$(document).ready(function(){
+			
+				"use strict";
+				
+				//============================================================================================================================================
+				
+				/*   This is the base file for the Sokoban assignment - include this one in your HTML page, before you add the main script file*/
+
+				/*   Enum of CSS Classes for the static elements   */
+				var Tiles = {
+					Wall: "tile tile-wall",
+					Space: "tile tile-space",
+					Goal: "tile tile-goal"
+					};
+
+				/*   Enum of CSS Classes for the moving elements   */
+				var Entities = {
+					Character: "entity entity-player",
+					Block: "entity entity-block",
+					BlockDone: "entity entity-block-goal"
+					};
+
+				/*  Legend
+					W = Wall
+					B = Movable block
+					P = Player starting position
+					G = Goal area for the blocks
+				*/
+				var mapsArray = [
+					{
+					width: 19,
+					height: 16,
+					mapGrid: [
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], ['B'], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], ['W'], ['W'], ['W'], [' '], [' '], ['B'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], ['W'], [' '], [' '], ['B'], [' '], ['B'], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[['W'], ['W'], ['W'], [' '], ['W'], [' '], ['W'], ['W'], [' '], ['W'], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W']],
+					[['W'], [' '], [' '], [' '], ['W'], [' '], ['W'], ['W'], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], ['G'], ['G'], ['W']],
+					[['W'], [' '], ['B'], [' '], [' '], ['B'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], ['B'], [' '], ['G'], ['G'], ['W']],
+					[['W'], ['W'], ['W'], ['W'], ['W'], [' '], ['W'], ['W'], ['W'], [' '], ['W'], ['P'], ['W'], ['W'], [' '], [' '], ['G'], ['G'], ['W']],
+					[[' '], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W']],
+					[[' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']]
+					]
+					},
+					{
+					width: 19,
+					height: 16,
+					mapGrid: [
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], ['B'], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], ['W'], ['W'], ['W'], [' '], [' '], ['B'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], ['W'], [' '], [' '], ['B'], [' '], ['B'], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[['W'], ['W'], ['W'], [' '], ['W'], [' '], ['W'], ['W'], [' '], ['W'], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W']],
+					[['W'], [' '], [' '], [' '], ['W'], [' '], ['W'], ['W'], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], ['G'], ['G'], ['W']],
+					[['W'], [' '], ['B'], [' '], [' '], ['B'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], ['G'], ['G'], ['W']],
+					[['W'], ['W'], ['W'], ['W'], ['W'], [' '], ['W'], ['W'], ['W'], [' '], ['W'], ['P'], ['W'], ['W'], [' '], [' '], ['G'], ['G'], ['W']],
+					[[' '], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W']],
+					[[' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']]
+					]
+					},
+					{
+					width: 19,
+					height: 16,
+					mapGrid: [
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], ['W'], ['B'], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], ['W'], ['W'], ['W'], [' '], [' '], ['B'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], ['W'], [' '], [' '], ['B'], [' '], ['B'], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[['W'], ['W'], ['W'], [' '], ['W'], [' '], ['W'], ['W'], [' '], ['W'], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W']],
+					[['W'], [' '], [' '], [' '], ['W'], [' '], ['W'], ['W'], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], ['G'], ['G'], ['W']],
+					[['W'], [' '], ['B'], [' '], [' '], ['B'], [' '], [' '], [' '], [' '], [' '], ['B'], [' '], [' '], ['B'], [' '], ['G'], ['G'], ['W']],
+					[['W'], ['W'], ['W'], ['W'], ['W'], [' '], ['W'], ['W'], ['W'], [' '], ['W'], ['P'], ['W'], ['W'], [' '], [' '], ['G'], ['G'], ['W']],
+					[[' '], [' '], [' '], [' '], ['W'], [' '], [' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W']],
+					[[' '], [' '], [' '], [' '], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], ['W'], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']],
+					[[' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' '], [' ']]
+					]
+					},
+					]
+
+					var tileMap = mapsArray[Math.floor(Math.random() * mapsArray.length)];
+
+//================================================================================================================================================================
+
+				var xMax = 18;
+				var yMax = 15;
+				var myArrayNum = 0;      //   CHOOSE WHICH MAP 0, 1 or 2
+
+				//
+				//     BUILD THE 320 <div> </div> LINES TO MAKE THE BOARD
+				//
+				
+				for (var y = 1; y <= (yMax + 1); y++)
+				{
+					var rowDiv = document.createElement('div');
+					rowDiv.id = 'row'+'-y'+y;
+					rowDiv.className = 'myrow';
+
+					for (var x = 1; x <= (xMax + 1); x++)
+					{
+																	// Create the inner div before appending to the body
+						var boxDiv = document.createElement('div');
+						boxDiv.id = 'x'+x+'-y'+y;
+						boxDiv.className = 'box myGreen';
+																	// The variable rowDiv is still good... Just append to it.
+						rowDiv.appendChild(boxDiv);
+					}
+																	// Then append the rowDiv with all it's boxDiv's onto the body
+					document.getElementById("myid").appendChild(rowDiv);
+				}
+				
+				//
+				//	<div id="row-y1" class="myrow">
+				//		<div id="x1-y1" class="box myGreen"></div>
+				//		<div id="x2-y1" class="box myGreen"></div>
+				//		<div id="x3-y1" class="box myGreen"></div>
+				//		 .....
+				//		 etc.
+				//
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+				
+				var myGreenRGB = "#C7D7A6";
+				var FBgreenRGB = "#99e600";
+				var xPosOld = 0;
+				var xPosNew = 0;
+				var yPosOld = 0;
+				var yPosNew = 0;
+				var oldPos = "x"+xPosOld+"-"+"y"+yPosOld;
+				console.log( "just defined oldPos = " + oldPos );
+				console.log( "just defined tileMap = " + (mapsArray[2].mapGrid[15][18]) );
+				console.log( "just defined length = " + (mapsArray.length) );
+			
+				
+				for (var yy=0; yy < yMax; yy++)
+				{
+					for (var xx=xMax; xx > -1; xx--)
+					{
+						console.log("xx and yy=" + xx + " " + yy);
+						if (mapsArray[myArrayNum].mapGrid[yy][xx] == "W")
+						{ 	
+							var wallPos = "x"+(xx + 1)+"-"+"y"+(yy + 1)
+							buildWall( wallPos )
+						}
+						else
+						{						
+							if (mapsArray[myArrayNum].mapGrid[yy][xx] == "B")
+							{	
+									var blockPos = "x"+(xx + 1)+"-"+"y"+(yy + 1)
+									putBlock( blockPos )
+							}
+							else
+							{
+								if (mapsArray[myArrayNum].mapGrid[yy][xx] == "G")
+								{
+									var goalPos = "x"+(xx + 1)+"-"+"y"+(yy + 1)
+									buildGoal( goalPos )
+								}
+								else
+								{
+									if (mapsArray[myArrayNum].mapGrid[yy][xx] == "P")  // draw Player in maze and get initial position from map
+									{
+										var oldPos = "x"+(xx + 1)+"-"+"y"+(yy + 1)
+										drawPlayer( oldPos )
+										xPosOld = (xx + 1)
+										yPosOld =  (yy + 1)
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				
+				
+				function drawPlayer(elementId) 
+				{
+					// Changes box to Orange and Yellow
+					var a_element = document.getElementById(elementId);
+					a_element.style.backgroundColor = "yellow";
+					a_element.style.border = "12px solid orange";
+				}
+				
+				function repairSquare(elementId) 
+				{
+					// Changes box back to original colour
+					var a_element = document.getElementById(elementId);
+					a_element.style.backgroundColor = myGreenRGB;
+					a_element.style.border = "0px";
+				}
+				
+				function buildWall(elementId) 
+				{
+					// 
+					console.log( "in buildWall " + wallPos );
+					var a_element = document.getElementById(elementId);
+					a_element.style.backgroundColor = "black";
+					a_element.style.border = "2px solid gray";
+				}
+				
+				function putBlock(elementId) 
+				{
+					// 
+					console.log( "in putBlock " + putBlock );
+					var a_element = document.getElementById(elementId);
+					a_element.style.backgroundColor = "darkred";
+					a_element.style.border = "1px solid red";
+				}
+				
+				
+				function buildGoal(elementId) 
+				{
+					// 
+					console.log( "in putBlock " + putBlock );
+					var a_element = document.getElementById(elementId);
+					a_element.style.backgroundColor = "#99e600";
+					a_element.style.border = "0px";
+				}
+				
+				document.onkeydown = function(event)
+				{
+					console.log("blah8");
+					console.log( "1. oldPos = " + oldPos );
+					console.log( "1. xPosOld = " + xPosOld );
+					var vv=event.keyCode;
+					console.log(vv);
+					
+					switch(event.keyCode)
+					{
+					case 37:
+						// Key left.
+						if (mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld - 2] == "W")
+						{
+							break;
+						}
+						if (mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld - 2] == "B")
+						{
+							if (mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld - 3] == "B" || mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld - 3] == "W")
+							{
+								break;
+							}
+							else 
+							{
+								var blockPos = "x"+(xPosOld - 2)+"-"+"y"+(yPosOld)
+								putBlock( blockPos )
+								mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld - 2] = " "
+								mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld - 3] = "B"
+							}	
+						}
+						var newPos = "x"+(xPosOld - 1)+"-"+"y"+yPosOld;
+						drawPlayer( newPos );
+						var oldPos = "x"+xPosOld+"-"+"y"+yPosOld;
+						repairSquare( oldPos );
+						xPosOld = xPosOld - 1
+						break;
+						
+					case 38:
+						// Key up.
+						if (mapsArray[myArrayNum].mapGrid[yPosOld - 2][xPosOld - 1] == "W")
+						{
+							break;
+						}
+						if (mapsArray[myArrayNum].mapGrid[yPosOld - 2][xPosOld - 1] == "B")
+						{
+							if (mapsArray[myArrayNum].mapGrid[yPosOld - 3][xPosOld - 1] == "B" || mapsArray[myArrayNum].mapGrid[yPosOld - 3][xPosOld - 1] == "W")
+							{
+								break;
+							}
+							else 
+							{
+								var blockPos = "x"+(xPosOld)+"-"+"y"+(yPosOld - 2)
+								putBlock( blockPos )
+								mapsArray[myArrayNum].mapGrid[yPosOld - 2][xPosOld - 1] = " "
+								mapsArray[myArrayNum].mapGrid[yPosOld - 3][xPosOld - 1] = "B"
+							}	
+						}
+						var newPos = "x"+xPosOld+"-"+"y"+(yPosOld - 1);
+						drawPlayer( newPos );
+						var oldPos = "x"+xPosOld+"-"+"y"+yPosOld;
+						repairSquare( oldPos );
+						yPosOld = yPosOld - 1;
+						break;
+						
+					case 39:
+						// Key right.
+						if (mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld] == "W")
+						{
+							break;
+						}
+						if (mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld] == "B")
+						{
+							if (mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld + 1] == "B" || mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld + 1] == "W")
+							{
+								break;
+							}
+							else 
+							{
+								var blockPos = "x"+(xPosOld + 2)+"-"+"y"+(yPosOld)
+								putBlock( blockPos )
+								mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld] = " "
+								mapsArray[myArrayNum].mapGrid[yPosOld - 1][xPosOld + 1] = "B"
+							}	
+						}
+						var newPos = "x"+(xPosOld + 1)+"-"+"y"+yPosOld;
+						drawPlayer( newPos );
+						var oldPos = "x"+xPosOld+"-"+"y"+yPosOld;
+						repairSquare( oldPos );
+						xPosOld = xPosOld + 1;
+						break;
+						
+					case 40:
+						// Key down.
+						if (mapsArray[myArrayNum].mapGrid[yPosOld][xPosOld - 1] == "W")
+						{
+							break;
+						}
+						if (mapsArray[myArrayNum].mapGrid[yPosOld][xPosOld - 1] == "B")
+						{
+							if (mapsArray[myArrayNum].mapGrid[yPosOld + 1][xPosOld - 1] == "B" || mapsArray[myArrayNum].mapGrid[yPosOld + 1][xPosOld - 1] == "W")
+							{
+								break;
+							}
+							else 
+							{
+								var blockPos = "x"+(xPosOld)+"-"+"y"+(yPosOld + 2)
+								putBlock( blockPos )
+								mapsArray[myArrayNum].mapGrid[yPosOld ][xPosOld - 1] = " "
+								mapsArray[myArrayNum].mapGrid[yPosOld + 1][xPosOld - 1] = "B"
+							}	
+						}
+						var newPos = "x"+xPosOld+"-"+"y"+(yPosOld + 1);
+						drawPlayer( newPos );
+						var oldPos = "x"+xPosOld+"-"+"y"+yPosOld;
+						repairSquare( oldPos );
+						yPosOld = yPosOld + 1;
+						break;
+					}
+				}
+			});
+		</script>
+		
+	</head>
+	
+	<body id=bodyId>
+		<style>
+			.myrow {
+				width: 570px;
+				}
+			.box {
+				width: 30px;
+				height: 30px;
+				font-size: 0;
+				float: left;
+				}
+			.myGreen {
+				background-color: #C7D7A6;
+			/*	border: solid;
+				border-color: #C7D7A6;
+				border-width: 1px; */
+				}
+			.FBgreen {
+				background-color: #C7D7A6;
+				}
+			.myRed {
+				background-color: red;
+				}
+		</style>
+		<h2>JS_Assignment14</h2>
+		<div id="myid" class="col-md-12">
+			<button id="demoChangeColour"> change colour </button>
+			<button id="moveUp"> Move Up </button>
+		</div>
+	</body>
+</html>
